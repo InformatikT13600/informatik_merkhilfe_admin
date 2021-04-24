@@ -1,4 +1,3 @@
-import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:informatik_merkhilfe_admin/shared/styles.dart';
 import 'package:informatik_merkhilfe_admin/views/home.dart';
