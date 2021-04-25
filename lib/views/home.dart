@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:informatik_merkhilfe_admin/models/SectionType.dart';
 import 'package:informatik_merkhilfe_admin/shared/styles.dart';
 import 'package:informatik_merkhilfe_admin/views/section.dart';
 
@@ -32,9 +33,9 @@ class _HomeState extends State<Home> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Section('Sprachen', expanded: false,),
-              Section('Kategorien', expanded: false,),
-              Section('Artikel', expanded: false,),
+              Section(SectionType.LANGUAGE, expanded: false,),
+              Section(SectionType.CATEGORY, expanded: false,),
+              Section(SectionType.ARTICLE, expanded: false,),
             ],
           ),
         ),

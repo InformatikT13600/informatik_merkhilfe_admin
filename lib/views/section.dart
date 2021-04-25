@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:informatik_merkhilfe_admin/models/SectionType.dart';
+import 'package:informatik_merkhilfe_admin/services/jsonService.dart';
 import 'package:informatik_merkhilfe_admin/shared/styles.dart';
+import 'package:informatik_merkhilfe_admin/views/languageEditor.dart';
 
 class Section extends StatefulWidget {
 
   static Map<String, bool> expanded = {};
+  static Map<String, TextEditingController> controllers = {};
+
   static final inputDecoration = InputDecoration(
     isDense: true,
     isCollapsed: false,
@@ -33,11 +38,13 @@ class Section extends StatefulWidget {
       ),
     ),
   );
-  final String name;
 
-  Section(this.name, {bool expanded}) {
+  final SectionType type;
+
+  Section(this.type, {bool expanded = false}) {
     // add the button to the map if it has not been done yet
-    Section.expanded.putIfAbsent(name, () => expanded);
+    Section.expanded.putIfAbsent(type.name, () => expanded);
+    Section.controllers.putIfAbsent(type.name, () => TextEditingController(text: '{}'));
   }
 
   @override
@@ -45,8 +52,14 @@ class Section extends StatefulWidget {
 }
 
 class _SectionState extends State<Section> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
+
+    print('expanded: ${Section.expanded[widget.type.name]}');
+
     return Flexible(
       child: Container(
         padding: EdgeInsets.all(20),
@@ -56,11 +69,11 @@ class _SectionState extends State<Section> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             TextButton(
-              key: Key('${widget.name}-button'),
+              key: Key('${widget.type}-button'),
               onPressed: () {
                 // update state
                 setState(() {
-                  Section.expanded.update(widget.name, (value) => !value, ifAbsent: () => false);
+                  Section.expanded.update(widget.type.name, (value) => !value, ifAbsent: () => false);
                 });
               },
               child: SizedBox(
@@ -69,26 +82,62 @@ class _SectionState extends State<Section> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(widget.name),
-                      SvgPicture.asset('assets/icons/arrow_${Section.expanded[widget.name] ? 'up' : 'down'}.svg'),
+                      Text(widget.type.name),
+                      SvgPicture.asset('assets/icons/arrow_${Section.expanded[widget.type.name] ? 'up' : 'down'}.svg'),
                     ]
                 ),
               ),
             ),
             SizedBox(height: 20,),
-            !Section.expanded[widget.name] ? Container() : Container(
-              child: TextFormField(
-                key: Key('${widget.name}-textfield'),
-                minLines: 1,
-                maxLines: 20,
-                decoration: Section.inputDecoration,
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  !Section.expanded[widget.type.name] ? Container() : Container(
+                    child: TextFormField(
+                      controller: Section.controllers[widget.type.name],
+                      validator: (value) => JsonService.isJson(value) ? null : 'Ungültiges Json-Format',
+                      autovalidateMode: AutovalidateMode.always,
+                      minLines: 1,
+                      maxLines: 20,
+                      decoration: Section.inputDecoration,
+                      onChanged: (val) => setState(() => {}),
+
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  Section.expanded[widget.type.name] && _formKey.currentState.validate() ? getEditor() : Container(child: Text('nicht valide'),),
+                ],
               ),
             ),
-            SizedBox(height: 20,),
-            !Section.expanded[widget.name] ? Container() : Text('Hier neues widget')
           ],
         ),
       ),
     );
   }
+
+  Widget getEditor() {
+    Widget editor;
+
+    switch(widget.type) {
+      case(SectionType.LANGUAGE): editor = LanguageEditor(); break;
+      default: editor = Text('valide');
+    }
+
+    print('Editor is: ${widget.type.name}');
+    return editor;
+  }
+}
+
+extension on SectionType {
+
+  String get name {
+    switch(this) {
+      case(SectionType.LANGUAGE): return 'Sprachen'; break;
+      case(SectionType.CATEGORY): return 'Kategorien'; break;
+      case(SectionType.ARTICLE): return 'Artikel'; break;
+      default: return '';
+    }
+  }
+
 }
