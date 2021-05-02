@@ -3,6 +3,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:informatik_merkhilfe_admin/models/language.dart';
 import 'package:informatik_merkhilfe_admin/services/jsonService.dart';
 import 'package:informatik_merkhilfe_admin/views/section.dart';
+import 'package:informatik_merkhilfe_admin/shared/styles.dart';
 
 class LanguageEditor extends StatefulWidget {
 
@@ -29,6 +30,7 @@ class _LanguageEditorState extends State<LanguageEditor> {
 
   @override
   Widget build(BuildContext context) {
+    // if list of Language objects is empty => check if there are any that can be read from the json input
     if(languages.isEmpty) languages = JsonService.readLanguages(Section.controllers[widget.controllerKey].value.text);
 
     return ReorderableListView.builder(
@@ -44,10 +46,13 @@ class _LanguageEditorState extends State<LanguageEditor> {
       clipBehavior: Clip.hardEdge,
       scrollDirection: Axis.vertical,
       onReorder: (oldIndex, newIndex) {
+
         // get moved language object
         Language moved = languages[oldIndex];
+
         // remove it from the list
         languages.remove(moved);
+
         // insert it at the new position
         languages.insert(newIndex, moved);
       },
@@ -106,25 +111,21 @@ class _LanguageEditorState extends State<LanguageEditor> {
                         titlePadding: const EdgeInsets.all(0.0),
                         contentPadding: const EdgeInsets.all(0.0),
                         scrollable: true,
-                        content: Center(
-                          child: Flexible(
-                            child: ColorPicker(
-                              pickerColor: languages[index].color,
-                              onColorChanged: (newColor) {
-                                languages[index].colorCode = newColor.toString().substring(8,16);
-                                update();
-                              },
-                              colorPickerWidth: 300.0,
-                              pickerAreaHeightPercent: 0.7,
-                              enableAlpha: true,
-                              displayThumbColor: true,
-                              showLabel: true,
-                              paletteType: PaletteType.rgb,
-                              pickerAreaBorderRadius: const BorderRadius.only(
-                                topLeft: const Radius.circular(2.0),
-                                topRight: const Radius.circular(2.0),
-                              ),
-                            ),
+                        backgroundColor: colorMainAppbar,
+                        content: Flexible(
+                          child: ColorPicker(
+                            pickerColor: languages[index].color,
+                            onColorChanged: (newColor) {
+                              languages[index].colorCode = newColor.toString().substring(8,16);
+                              update();
+                            },
+                            colorPickerWidth: 300.0,
+                            pickerAreaHeightPercent: 0.7,
+                            enableAlpha: true,
+                            displayThumbColor: true,
+                            showLabel: true,
+                            paletteType: PaletteType.rgb,
+                            pickerAreaBorderRadius: const BorderRadius.all(const Radius.circular(2.0)),
                           ),
                         ),
                         actions: [TextButton(child: Text('Schließen'), onPressed: () => Navigator.pop(context),)],
