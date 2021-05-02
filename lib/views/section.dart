@@ -44,7 +44,7 @@ class Section extends StatefulWidget {
   Section(this.type, {bool expanded = false}) {
     // add the button to the map if it has not been done yet
     Section.expanded.putIfAbsent(type.name, () => expanded);
-    Section.controllers.putIfAbsent(type.name, () => TextEditingController(text: '{}'));
+    Section.controllers.putIfAbsent(type.name, () => TextEditingController(text: '[]'));
   }
 
   @override
@@ -92,21 +92,27 @@ class _SectionState extends State<Section> {
             Form(
               key: _formKey,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   !Section.expanded[widget.type.name] ? Container() : Container(
                     child: TextFormField(
                       controller: Section.controllers[widget.type.name],
-                      validator: (value) => JsonService.isJson(value) ? null : 'Ungültiges Json-Format',
+                      validator: (value) {
+                        if(!JsonService.isJson(value)) return 'Ungültiges Json-Format';
+                        if(!isCorrectFormat(value)) return 'Das JsonObject entspricht nicht dem richtigen Format für diesen Typ';
+
+                        return null;
+                      },
                       autovalidateMode: AutovalidateMode.always,
                       minLines: 1,
-                      maxLines: 20,
+                      maxLines: 5,
                       decoration: Section.inputDecoration,
                       onChanged: (val) => setState(() => {}),
 
                     ),
                   ),
                   SizedBox(height: 20,),
-                  Section.expanded[widget.type.name] && _formKey.currentState.validate() ? getEditor() : Container(child: Text('nicht valide'),),
+                  Section.expanded[widget.type.name] && _formKey.currentState.validate() ? getEditor(widget.type.name) : Container(),
                 ],
               ),
             ),
@@ -115,12 +121,19 @@ class _SectionState extends State<Section> {
       ),
     );
   }
+  
+  bool isCorrectFormat(String input) {
+    switch(widget.type) {
+      case(SectionType.LANGUAGE): return JsonService.validateLanguageJsonString(input);
+      default: return false;
+    }
+}
 
-  Widget getEditor() {
+  Widget getEditor(String key) {
     Widget editor;
 
     switch(widget.type) {
-      case(SectionType.LANGUAGE): editor = LanguageEditor(); break;
+      case(SectionType.LANGUAGE): editor = LanguageEditor(key); break;
       default: editor = Text('valide');
     }
 
