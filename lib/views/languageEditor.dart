@@ -18,6 +18,8 @@ class _LanguageEditorState extends State<LanguageEditor> {
   
   List<Language> languages = [];
 
+  bool valid = true;
+
   update() => setState(() {});
 
   @override
@@ -65,13 +67,28 @@ class _LanguageEditorState extends State<LanguageEditor> {
             )
           ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                lang.name,
-                style: TextStyle(color: lang.color, fontSize: 30),
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  width: 100,
+                  child: TextFormField(
+                    key: Key('${lang.name}-textinput'),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      isCollapsed: false,
+                      border: UnderlineInputBorder(borderSide: BorderSide.none),
+                    ),
+                    initialValue: lang.name,
+                    onChanged: (newName) => languages[index].name = newName,
+                    style: TextStyle(color: lang.color, fontSize: 30),
+                  ),
+                ),
               ),
               IconButton(
-                key: Key(lang.name+"-gesture"),
+                key: Key('${lang.name}-gesture'),
                 splashRadius: 20,
                 icon: Container(
                   height: 20,
@@ -94,10 +111,7 @@ class _LanguageEditorState extends State<LanguageEditor> {
                             child: ColorPicker(
                               pickerColor: languages[index].color,
                               onColorChanged: (newColor) {
-                                print(newColor.toString());
-                                languages.removeAt(index);
-                                lang.colorCode = newColor.toString().substring(8,16);
-                                languages.insert(index, lang);
+                                languages[index].colorCode = newColor.toString().substring(8,16);
                                 update();
                               },
                               colorPickerWidth: 300.0,
@@ -118,7 +132,8 @@ class _LanguageEditorState extends State<LanguageEditor> {
                     },
                   );
                 },
-              )
+              ),
+              SizedBox(width: 30,)
 
             ],
           )
