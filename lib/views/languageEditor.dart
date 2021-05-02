@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:informatik_merkhilfe_admin/models/language.dart';
 import 'package:informatik_merkhilfe_admin/services/jsonService.dart';
 import 'package:informatik_merkhilfe_admin/views/section.dart';
@@ -18,10 +17,17 @@ class LanguageEditor extends StatefulWidget {
 class _LanguageEditorState extends State<LanguageEditor> {
   
   List<Language> languages = [];
-  
+
+  update() => setState(() {});
+
+  @override
+  void initState() {
+    languages = JsonService.readLanguages(Section.controllers[widget.controllerKey].value.text);
+  }
+
   @override
   Widget build(BuildContext context) {
-    languages = JsonService.readLanguages(Section.controllers[widget.controllerKey].value.text);
+    if(languages.isEmpty) languages = JsonService.readLanguages(Section.controllers[widget.controllerKey].value.text);
 
     return ReorderableListView.builder(
       key: UniqueKey(),
@@ -64,6 +70,56 @@ class _LanguageEditorState extends State<LanguageEditor> {
                 lang.name,
                 style: TextStyle(color: lang.color, fontSize: 30),
               ),
+              IconButton(
+                key: Key(lang.name+"-gesture"),
+                splashRadius: 20,
+                icon: Container(
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    color: lang.color,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        titlePadding: const EdgeInsets.all(0.0),
+                        contentPadding: const EdgeInsets.all(0.0),
+                        scrollable: true,
+                        content: Center(
+                          child: Flexible(
+                            child: ColorPicker(
+                              pickerColor: languages[index].color,
+                              onColorChanged: (newColor) {
+                                print(newColor.toString());
+                                languages.removeAt(index);
+                                lang.colorCode = newColor.toString().substring(8,16);
+                                languages.insert(index, lang);
+                                update();
+                              },
+                              colorPickerWidth: 300.0,
+                              pickerAreaHeightPercent: 0.7,
+                              enableAlpha: true,
+                              displayThumbColor: true,
+                              showLabel: true,
+                              paletteType: PaletteType.rgb,
+                              pickerAreaBorderRadius: const BorderRadius.only(
+                                topLeft: const Radius.circular(2.0),
+                                topRight: const Radius.circular(2.0),
+                              ),
+                            ),
+                          ),
+                        ),
+                        actions: [TextButton(child: Text('Schließen'), onPressed: () => Navigator.pop(context),)],
+                      );
+                    },
+                  );
+                },
+              )
+
             ],
           )
         );
