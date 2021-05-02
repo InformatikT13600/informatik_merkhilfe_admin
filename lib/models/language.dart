@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 
 class Language {
@@ -5,12 +7,17 @@ class Language {
   String name;
   String colorCode;
 
-  Language(this.name, this.colorCode);
+  // used for the language editor (key)
+  int id;
+
+  Language(this.name, this.colorCode) {
+    this.id = Random().nextInt(2147483647);
+  }
 
   Language.fromJSON(Map<String, dynamic> json) {
     name = json['name'] == null ? '' : json['name'];
     colorCode = json['colorCode'] == null ? '' : json['colorCode'];
-
+    id = Random().nextInt(2147483647);
   }
 
   Map<String, dynamic> toJson() {

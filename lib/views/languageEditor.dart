@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:informatik_merkhilfe_admin/models/language.dart';
 import 'package:informatik_merkhilfe_admin/services/jsonService.dart';
 import 'package:informatik_merkhilfe_admin/views/section.dart';
@@ -36,11 +37,27 @@ class _LanguageEditorState extends State<LanguageEditor> {
     return ReorderableListView.builder(
       key: UniqueKey(),
       shrinkWrap: true,
-      header: TextButton(
-          onPressed: () {
-            Section.controllers[widget.controllerKey].text = JsonService.writeLanguages(languages);
-          },
-          child: Text('JSON updaten')
+      header: Column(
+        children: [
+          TextButton(
+              onPressed: () {
+                Section.controllers[widget.controllerKey].text = JsonService.writeLanguages(languages);
+              },
+              child: Text('JSON updaten')
+          ),
+          IconButton(
+            icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
+            onPressed: () {
+
+              // check if there alredy is a language without name
+              if(!languages.any((element) => element.name.isEmpty)) {
+                setState(() {
+                  languages.add(new Language('', 'ffffffff'));
+                });
+              }
+            },
+          )
+        ],
       ),
       itemCount: languages.length,
       clipBehavior: Clip.hardEdge,
@@ -61,7 +78,7 @@ class _LanguageEditorState extends State<LanguageEditor> {
         Language lang = languages[index];
 
         return Container(
-          key: Key(lang.name),
+          key: Key('${lang.id}'),
           padding: EdgeInsets.all(5),
           margin: EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
@@ -80,7 +97,7 @@ class _LanguageEditorState extends State<LanguageEditor> {
                   height: 40,
                   width: 100,
                   child: TextFormField(
-                    key: Key('${lang.name}-textinput'),
+                    key: Key('${lang.id}-textinput'),
                     decoration: InputDecoration(
                       isDense: true,
                       isCollapsed: false,
@@ -93,7 +110,7 @@ class _LanguageEditorState extends State<LanguageEditor> {
                 ),
               ),
               IconButton(
-                key: Key('${lang.name}-gesture'),
+                key: Key('${lang.id}-gesture'),
                 splashRadius: 20,
                 icon: Container(
                   height: 20,

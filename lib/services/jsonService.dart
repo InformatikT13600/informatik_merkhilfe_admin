@@ -51,6 +51,8 @@ class JsonService {
       // read json array from json file
       List<dynamic> languages = jsonDecode(jsonString);
 
+      List<Language> tempLanguageObjects = [];
+
       // iterate through all language json objects
       for(Map<String, dynamic> map in languages) {
 
@@ -59,8 +61,11 @@ class JsonService {
 
         if(!lang.isValid()) return false;
 
+        tempLanguageObjects.add(lang);
       }
-      return true;
+
+      // check if any language objects share the same name
+      return !tempLanguageObjects.any((element1) => tempLanguageObjects.any((element2) => element1 != element2 && element1.name == element2.name));
     } on FormatException catch(e) {
       return false;
     }
