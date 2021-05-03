@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:informatik_merkhilfe_admin/models/category.dart';
 import 'package:informatik_merkhilfe_admin/models/language.dart';
 
 class JsonService {
@@ -70,5 +71,61 @@ class JsonService {
       return false;
     }
   }
+
+  /// takes a list of [Category]s and tries to encode it as a jsonString
+  static String writeCategories(List<Category> list) {
+    return JsonEncoder.withIndent('  ').convert(list);
+  }
+
+  /// takes a [jsonString] and tries to decode it as a [List<Category>]
+  static List<Category> readCategories(String jsonString) {
+    if(!validateCategoryJsonString(jsonString)) return [];
+
+    List<Category> list = [];
+
+    // read json array from json file
+    List<dynamic> categories = jsonDecode(jsonString);
+
+    // iterate through all language json objects
+    for(Map<String, dynamic> map in categories) {
+
+      // generate language object from json object
+      Category cat = Category.fromJSON(map);
+
+      // build up children
+      cat.buildTree();
+
+      list.add(cat);
+    }
+
+    return list;
+  }
+
+  /// checks if a given [jsonString] is a valid category json
+  static bool validateCategoryJsonString(String jsonString) {
+    if(!isJson(jsonString)) return false;
+
+    try {
+      // check if json is a json array
+      if(!(jsonDecode(jsonString) is List<dynamic>)) return false;
+
+      // read json array from json file
+      List<dynamic> categories = jsonDecode(jsonString);
+
+      // iterate through all category json objects
+      for(Map<String, dynamic> map in categories) {
+
+        // generate category object from json object
+        Category cat = Category.fromJSON(map);
+
+        if(!cat.isValid()) return false;
+      }
+
+      return true;
+    } on FormatException catch(e) {
+      return false;
+    }
+  }
+
 
 }

@@ -1,23 +1,45 @@
+import 'dart:math';
+
 class Category {
 
   String language;
-  int orderPriority;
   String name;
   List<Map<String, dynamic>> children = [];
   String parentCategory;
   List<Category> childrenCategories = [];
 
-  Category(this.language, this.children, this.name, this.orderPriority);
+  // used for the language editor (key)
+  int id;
+
+  Category(this.language, this.children, this.name) {
+    this.id = Random().nextInt(2147483647);
+  }
 
   /// deserializes a [json] and creates a [Category]
   Category.fromJSON(Map<String, dynamic> json) {
     name = json['name'];
-    orderPriority = json['orderPriority'];
     language = json['language'];
+
+    this.id = Random().nextInt(2147483647);
 
     List<dynamic> childrenList = json['children'];
     if(childrenList == null || childrenList.isEmpty) return;
     for(Map<String, dynamic> child in childrenList) children.add(child);
+  }
+
+  Map<String, dynamic> toJson() {
+
+    // convert children to json objects
+    List<dynamic> childrenList = [];
+    for(Category child in childrenCategories) {
+      childrenList.add(child.toJson());
+    }
+
+    return {
+      'name': name,
+      'language': language,
+      'children': childrenList,
+    };
   }
 
   /// tells whether or not the [Category] is valid

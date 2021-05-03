@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:informatik_merkhilfe_admin/models/SectionType.dart';
 import 'package:informatik_merkhilfe_admin/services/jsonService.dart';
 import 'package:informatik_merkhilfe_admin/shared/styles.dart';
+import 'package:informatik_merkhilfe_admin/views/categoryEditor.dart';
 import 'package:informatik_merkhilfe_admin/views/languageEditor.dart';
 
 class Section extends StatefulWidget {
@@ -57,9 +58,6 @@ class _SectionState extends State<Section> {
 
   @override
   Widget build(BuildContext context) {
-
-    print('expanded: ${Section.expanded[widget.type.name]}');
-
     return Flexible(
       child: Container(
         padding: EdgeInsets.all(20),
@@ -89,31 +87,33 @@ class _SectionState extends State<Section> {
               ),
             ),
             SizedBox(height: 20,),
-            Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  !Section.expanded[widget.type.name] ? Container() : Container(
-                    child: TextFormField(
-                      controller: Section.controllers[widget.type.name],
-                      validator: (value) {
-                        if(!JsonService.isJson(value)) return 'Ungültiges Json-Format';
-                        if(!isCorrectFormat(value)) return 'Das JsonObject entspricht nicht dem richtigen Format für diesen Typ';
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    !Section.expanded[widget.type.name] ? Container() : Container(
+                      child: TextFormField(
+                        controller: Section.controllers[widget.type.name],
+                        validator: (value) {
+                          if(!JsonService.isJson(value)) return 'Ungültiges Json-Format';
+                          if(!isCorrectFormat(value)) return 'Das JsonObject entspricht nicht dem richtigen Format für diesen Typ';
 
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.always,
-                      minLines: 1,
-                      maxLines: 5,
-                      decoration: Section.inputDecoration,
-                      onChanged: (val) => setState(() => {}),
+                          return null;
+                        },
+                        autovalidateMode: AutovalidateMode.always,
+                        minLines: 1,
+                        maxLines: 5,
+                        decoration: Section.inputDecoration,
+                        onChanged: (val) => setState(() => {}),
 
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20,),
-                  Section.expanded[widget.type.name] && _formKey.currentState.validate() ? getEditor(widget.type.name) : Container(),
-                ],
+                    SizedBox(height: 20,),
+                    Section.expanded[widget.type.name] && _formKey.currentState.validate() ? getEditor(widget.type.name) : Container(),
+                  ],
+                ),
               ),
             ),
           ],
@@ -125,6 +125,7 @@ class _SectionState extends State<Section> {
   bool isCorrectFormat(String input) {
     switch(widget.type) {
       case(SectionType.LANGUAGE): return JsonService.validateLanguageJsonString(input);
+      case(SectionType.CATEGORY): return JsonService.validateCategoryJsonString(input);
       default: return false;
     }
 }
@@ -134,11 +135,11 @@ class _SectionState extends State<Section> {
 
     switch(widget.type) {
       case(SectionType.LANGUAGE): editor = LanguageEditor(key); break;
+      case(SectionType.CATEGORY): editor = CategoryEditor(key); break;
       default: editor = Text('valide');
     }
 
-    print('Editor is: ${widget.type.name}');
-    return editor;
+    return Flexible(child: editor);
   }
 }
 

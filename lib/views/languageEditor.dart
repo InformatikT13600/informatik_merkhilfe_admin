@@ -49,7 +49,7 @@ class _LanguageEditorState extends State<LanguageEditor> {
             icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
             onPressed: () {
 
-              // check if there alredy is a language without name
+              // check if there already is a language without name
               if(!languages.any((element) => element.name.isEmpty)) {
                 setState(() {
                   languages.add(new Language('', 'ffffffff'));
