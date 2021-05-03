@@ -43,7 +43,7 @@ class _LanguageEditorState extends State<LanguageEditor> {
               onPressed: () {
                 Section.controllers[widget.controllerKey].text = JsonService.writeLanguages(languages);
               },
-              child: Text('JSON updaten')
+              child: Text('^ In JSON schreiben ^')
           ),
           IconButton(
             icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
@@ -67,11 +67,11 @@ class _LanguageEditorState extends State<LanguageEditor> {
         // get moved language object
         Language moved = languages[oldIndex];
 
-        // remove it from the list
-        languages.remove(moved);
-
         // insert it at the new position
         languages.insert(newIndex, moved);
+
+        // remove it from the list
+        languages.removeAt(oldIndex);
       },
       itemBuilder: (context, index) {
 
