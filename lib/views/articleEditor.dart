@@ -235,6 +235,8 @@ class _ArticleEditorState extends State<ArticleEditor> {
                                                   initialValue: tags[tagIndex],
                                                   onChanged: (newTag) => tags[tagIndex] = newTag,
                                                   style: TextStyle(color: colorContrast, fontSize: 25),
+                                                  validator: (input) => input.isEmpty ? 'Leerer Tag' : null,
+                                                  autovalidateMode: AutovalidateMode.always,
                                                 ),
                                               ),
                                               IconButton(
