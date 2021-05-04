@@ -139,7 +139,7 @@ class _SectionState extends State<Section> {
       default: editor = Text('valide');
     }
 
-    return Flexible(child: editor);
+    return Flexible(key: Key(key), child: editor);
   }
 }
 

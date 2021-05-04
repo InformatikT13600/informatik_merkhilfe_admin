@@ -20,6 +20,7 @@ class CategoryEditor extends StatefulWidget {
 class _CategoryEditorState extends State<CategoryEditor> {
 
   List<Category> categories = [];
+  Map<String, bool> showChildren = {};
 
   bool valid = true;
 
@@ -37,11 +38,8 @@ class _CategoryEditorState extends State<CategoryEditor> {
     if(!JsonService.validateLanguageJsonString(Section.controllers[SectionType.LANGUAGE.name].text)) {
       return Container(child: Text('Ungültige Language JSON', style: TextStyle(fontSize: 30, color: colorRed),));
     }
-
-    // if list of Category objects is empty => check if there are any that can be read from the json input
-    if(categories.isEmpty) categories = JsonService.readCategories(Section.controllers[widget.controllerKey].value.text);
-
-    // read Languag objects
+    
+    // read Language objects
     List<Language> languages = JsonService.readLanguages(Section.controllers[SectionType.LANGUAGE.name].value.text);
 
     return ReorderableListView.builder(
@@ -87,6 +85,9 @@ class _CategoryEditorState extends State<CategoryEditor> {
       itemBuilder: (context, index) {
 
         Category cat = categories[index];
+
+        String showChildrenKey = cat.language+cat.name;
+        showChildren.putIfAbsent(showChildrenKey, () => false);
 
         return Container(
             key: Key('${cat.id}'),
@@ -143,6 +144,14 @@ class _CategoryEditorState extends State<CategoryEditor> {
                       style: TextStyle(color: colorMainAppbar, fontSize: 30),
                     ),
                   ),
+                ),
+                IconButton(
+                  icon: SvgPicture.asset('assets/icons/arrow_${showChildren[showChildrenKey] ? 'up' : 'down'}.svg'),
+                  onPressed: () {
+                      setState(() {
+                        showChildren.update(showChildrenKey, (value) => !value);
+                      });
+                  },
                 ),
                 SizedBox(width: 30,)
               ],

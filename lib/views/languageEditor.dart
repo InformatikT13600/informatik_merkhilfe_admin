@@ -31,9 +31,6 @@ class _LanguageEditorState extends State<LanguageEditor> {
 
   @override
   Widget build(BuildContext context) {
-    // if list of Language objects is empty => check if there are any that can be read from the json input
-    if(languages.isEmpty) languages = JsonService.readLanguages(Section.controllers[widget.controllerKey].value.text);
-
     return ReorderableListView.builder(
       key: UniqueKey(),
       shrinkWrap: true,
@@ -149,6 +146,13 @@ class _LanguageEditorState extends State<LanguageEditor> {
                       );
                     },
                   );
+                },
+              ),
+              IconButton(
+                icon: SvgPicture.asset('assets/icons/delete.svg'),
+                onPressed: () {
+                  languages.remove(lang);
+                  update();
                 },
               ),
               SizedBox(width: 30,)
