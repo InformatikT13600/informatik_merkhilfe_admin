@@ -28,7 +28,13 @@ class _ArticleEditorState extends State<ArticleEditor> {
 
   @override
   void initState() {
-    articles = JsonService.readArticles(Section.controllers[widget.controllerKey].value.text);
+    readJsonInputField();
+  }
+
+  void readJsonInputField() {
+    setState(() {
+      articles = JsonService.readArticles(Section.controllers[widget.controllerKey].value.text);
+    });
   }
 
   @override
@@ -64,7 +70,13 @@ class _ArticleEditorState extends State<ArticleEditor> {
               onPressed: () {
                 Section.controllers[widget.controllerKey].text = JsonService.writeArticles(articles);
               },
-              child: Text('^ In JSON schreiben ^')
+              child: Text('∧ In JSON schreiben ∧')
+          ),
+          TextButton(
+              onPressed: () {
+                readJsonInputField();
+              },
+              child: Text('∨ JSON lesen ∨')
           ),
           IconButton(
             icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
@@ -102,7 +114,7 @@ class _ArticleEditorState extends State<ArticleEditor> {
             key: Key('${article.id}'),
             padding: EdgeInsets.all(5),
             margin: EdgeInsets.only(bottom: 10),
-            height: 100,
+            height: 110,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
@@ -187,7 +199,9 @@ class _ArticleEditorState extends State<ArticleEditor> {
                     IconButton(
                       icon: SvgPicture.asset('assets/icons/content.svg'),
                       onPressed: () {
-                        print('edit content');
+
+
+
                       },
                     ),
                     IconButton(

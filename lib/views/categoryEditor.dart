@@ -28,7 +28,13 @@ class _CategoryEditorState extends State<CategoryEditor> {
 
   @override
   void initState() {
-    categories = JsonService.readCategories(Section.controllers[widget.controllerKey].value.text);
+    readJsonInputField();
+  }
+
+  void readJsonInputField() {
+    setState(() {
+      categories = JsonService.readCategories(Section.controllers[widget.controllerKey].value.text);
+    });
   }
 
   @override
@@ -51,7 +57,13 @@ class _CategoryEditorState extends State<CategoryEditor> {
               onPressed: () {
                 Section.controllers[widget.controllerKey].text = JsonService.writeCategories(categories);
               },
-              child: Text('^ In JSON schreiben ^')
+              child: Text('∧ In JSON schreiben ∧')
+          ),
+          TextButton(
+              onPressed: () {
+                readJsonInputField();
+              },
+              child: Text('∨ JSON lesen ∨')
           ),
           IconButton(
             icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
