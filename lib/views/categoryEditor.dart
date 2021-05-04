@@ -38,7 +38,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
     if(!JsonService.validateLanguageJsonString(Section.controllers[SectionType.LANGUAGE.name].text)) {
       return Container(child: Text('Ungültige Language JSON', style: TextStyle(fontSize: 30, color: colorRed),));
     }
-    
+
     // read Language objects
     List<Language> languages = JsonService.readLanguages(Section.controllers[SectionType.LANGUAGE.name].value.text);
 
@@ -93,7 +93,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
             key: Key('${cat.id}'),
             padding: EdgeInsets.all(5),
             margin: EdgeInsets.only(bottom: 10),
-            height: 70,
+            height: 80,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
@@ -106,43 +106,35 @@ class _CategoryEditorState extends State<CategoryEditor> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: SizedBox(
-                    height: 40,
-                    width: 100,
-                    child: TextFormField(
-                      key: Key('${cat.id}-textinput'),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        isCollapsed: false,
-                        border: UnderlineInputBorder(borderSide: BorderSide.none),
-                      ),
-                      initialValue: cat.name,
-                      onChanged: (newName) => categories[index].name = newName,
-                      style: TextStyle(color: colorMainAppbar, fontSize: 30),
+                  child: TextFormField(
+                    key: Key('${cat.id}-textinput'),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      isCollapsed: false,
+                      border: UnderlineInputBorder(borderSide: BorderSide.none),
                     ),
+                    initialValue: cat.name,
+                    onChanged: (newName) => categories[index].name = newName,
+                    style: TextStyle(color: colorMainAppbar, fontSize: 30),
                   ),
                 ),
                 Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
                 Expanded(
-                  child: SizedBox(
-                    height: 40,
-                    width: 100,
-                    child: TextFormField(
-                      key: Key('${cat.id}-languageinput'),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        isCollapsed: false,
-                        border: UnderlineInputBorder(borderSide: BorderSide.none),
-                      ),
-                      initialValue: cat.language,
-                      autovalidateMode: AutovalidateMode.always,
-                      validator: (input) {
-                        // checks if there is any language, that starts with the input
-                        return !languages.any((element) => element.name.startsWith(input)) ? 'Unbekannte Sprache' : null;
-                      },
-                      onChanged: (newLanguage) => categories[index].language = newLanguage,
-                      style: TextStyle(color: colorMainAppbar, fontSize: 30),
+                  child: TextFormField(
+                    key: Key('${cat.id}-languageinput'),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      isCollapsed: false,
+                      border: UnderlineInputBorder(borderSide: BorderSide.none),
                     ),
+                    initialValue: cat.language,
+                    autovalidateMode: AutovalidateMode.always,
+                    validator: (input) {
+                      // checks if there is any language, that starts with the input
+                      return !languages.any((element) => element.name.startsWith(input)) ? 'Unbekannte Sprache' : null;
+                    },
+                    onChanged: (newLanguage) => categories[index].language = newLanguage,
+                    style: TextStyle(color: colorMainAppbar, fontSize: 30),
                   ),
                 ),
                 IconButton(
