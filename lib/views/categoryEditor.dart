@@ -93,7 +93,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
             key: Key('${cat.id}'),
             padding: EdgeInsets.all(5),
             margin: EdgeInsets.only(bottom: 10),
-            height: 80,
+            height: 70,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
@@ -115,7 +115,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
                     ),
                     initialValue: cat.name,
                     onChanged: (newName) => categories[index].name = newName,
-                    style: TextStyle(color: colorMainAppbar, fontSize: 30),
+                    style: TextStyle(color: colorMainAppbar, fontSize: 25),
                   ),
                 ),
                 Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
@@ -134,7 +134,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
                       return !languages.any((element) => element.name.startsWith(input)) ? 'Unbekannte Sprache' : null;
                     },
                     onChanged: (newLanguage) => categories[index].language = newLanguage,
-                    style: TextStyle(color: colorMainAppbar, fontSize: 30),
+                    style: TextStyle(color: colorMainAppbar, fontSize: 25),
                   ),
                 ),
                 IconButton(

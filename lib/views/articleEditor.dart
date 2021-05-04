@@ -102,7 +102,7 @@ class _ArticleEditorState extends State<ArticleEditor> {
             key: Key('${article.id}'),
             padding: EdgeInsets.all(5),
             margin: EdgeInsets.only(bottom: 10),
-            height: 80,
+            height: 100,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
@@ -110,70 +110,175 @@ class _ArticleEditorState extends State<ArticleEditor> {
                   width: 3,
                 )
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Column(
               children: [
                 Expanded(
-                  child: TextFormField(
-                    key: Key('${article.id}-textinput'),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      isCollapsed: false,
-                      border: UnderlineInputBorder(borderSide: BorderSide.none),
-                    ),
-                    initialValue: article.name,
-                    onChanged: (newName) => articles[index].name = newName,
-                    style: TextStyle(color: colorMainAppbar, fontSize: 30),
-                  ),
-                ),
-                Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
-                Expanded(
-                  child: TextFormField(
-                    key: Key('${article.id}-languageinput'),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      isCollapsed: false,
-                      border: UnderlineInputBorder(borderSide: BorderSide.none),
-                    ),
-                    initialValue: article.language,
-                    autovalidateMode: AutovalidateMode.always,
-                    validator: (input) {
-                      // checks if there is any language, that starts with the input
-                      return !languages.any((element) => element.name.startsWith(input)) ? 'Unbekannte Sprache' : null;
-                    },
-                    onChanged: (newLanguage) => articles[index].language = newLanguage,
-                    style: TextStyle(color: colorMainAppbar, fontSize: 30),
-                  ),
-                ),
-                Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
-                Expanded(
-                  child: TextFormField(
-                    key: Key('${article.id}-categoryinput'),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      isCollapsed: false,
-                      border: UnderlineInputBorder(borderSide: BorderSide.none),
-                    ),
-                    initialValue: article.category,
-                    autovalidateMode: AutovalidateMode.always,
-                    validator: (input) {
-                      // checks if there is any category, that starts with the input
-                      return !categories.any((element) => element.name.startsWith(input)) ? 'Unbekannte Kategorie' : null;
-                    },
-                    onChanged: (newCategory) => articles[index].category = newCategory,
-                    style: TextStyle(color: colorMainAppbar, fontSize: 30),
-                  ),
-                ),
-                IconButton(
-                  icon: SvgPicture.asset('assets/icons/delete.svg'),
-                  onPressed: () {
-                    articles.remove(article);
-                    update();
-                  },
-                ),
-                SizedBox(width: 30,)
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          key: Key('${article.id}-textinput'),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            isCollapsed: false,
+                            border: UnderlineInputBorder(borderSide: BorderSide.none),
+                          ),
+                          initialValue: article.name,
+                          onChanged: (newName) => articles[index].name = newName,
+                          style: TextStyle(color: colorMainAppbar, fontSize: 25),
+                        ),
+                      ),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
+                      Expanded(
+                        child: TextFormField(
+                          key: Key('${article.id}-languageinput'),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            isCollapsed: false,
+                            border: UnderlineInputBorder(borderSide: BorderSide.none),
+                          ),
+                          initialValue: article.language,
+                          autovalidateMode: AutovalidateMode.always,
+                          validator: (input) {
+                            // checks if there is any language, that starts with the input
+                            return !languages.any((element) => element.name.startsWith(input)) ? 'Unbekannte Sprache' : null;
+                          },
+                          onChanged: (newLanguage) => articles[index].language = newLanguage,
+                          style: TextStyle(color: colorMainAppbar, fontSize: 25),
+                        ),
+                      ),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
+                      Expanded(
+                        child: TextFormField(
+                          key: Key('${article.id}-categoryinput'),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            isCollapsed: false,
+                            border: UnderlineInputBorder(borderSide: BorderSide.none),
+                          ),
+                          initialValue: article.category,
+                          autovalidateMode: AutovalidateMode.always,
+                          validator: (input) {
+                            // checks if there is any category, that starts with the input
+                            return !categories.any((element) => element.name.startsWith(input)) ? 'Unbekannte Kategorie' : null;
+                          },
+                          onChanged: (newCategory) => articles[index].category = newCategory,
+                          style: TextStyle(color: colorMainAppbar, fontSize: 25),
+                        ),
+                      ),
+                      SizedBox(width: 30,)
 
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: SvgPicture.asset('assets/icons/delete.svg'),
+                      onPressed: () {
+                        articles.remove(article);
+                        update();
+                      },
+                    ),
+                    IconButton(
+                      icon: SvgPicture.asset('assets/icons/content.svg'),
+                      onPressed: () {
+                        print('edit content');
+                      },
+                    ),
+                    IconButton(
+                      icon: SvgPicture.asset('assets/icons/tags.svg'),
+                      onPressed: () {
+                        showDialog(context: context, builder: (context) {
+                          // copy the tag list of the article
+                          List<String> tags = List.from(article.tags);
+
+                          return StatefulBuilder(builder: (context, setState) {
+                            return AlertDialog(
+                              backgroundColor: colorMainBackground,
+                              title: Center(child: Text('Tags', style: TextStyle(fontSize: 30, color: colorMainAppbar),)),
+                              content: Container(
+                                height: 800,
+                                width: 400,
+                                child: Column(
+                                  children: [
+                                    IconButton(
+                                      icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
+                                      onPressed: () {
+                                        // check if there already is a tag without name
+                                        if(!tags.any((element) => element.isEmpty)) {
+                                          setState(() {
+                                            tags.add('');
+                                          });
+                                        }
+                                      },
+                                    ),
+                                    Expanded(
+                                      child: ListView.builder(
+                                        itemCount: tags.length,
+                                        scrollDirection: Axis.vertical,
+                                        itemBuilder: (context, tagIndex) {
+                                          return Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextFormField(
+                                                  key: Key('${article.id}-tag-${tags[tagIndex]}'),
+                                                  decoration: InputDecoration(
+                                                    isDense: true,
+                                                    isCollapsed: false,
+                                                    border: UnderlineInputBorder(borderSide: BorderSide.none),
+                                                  ),
+                                                  initialValue: tags[tagIndex],
+                                                  onChanged: (newTag) => tags[tagIndex] = newTag,
+                                                  style: TextStyle(color: colorContrast, fontSize: 25),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: SvgPicture.asset('assets/icons/delete.svg'),
+                                                onPressed: () {
+                                                  tags.removeAt(tagIndex);
+                                                  setState(() {});
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    TextButton(
+                                      child: Text('Änderung Speichern'),
+                                      onPressed: () {
+                                        // remove empty tags
+                                        tags.removeWhere((element) => element.isEmpty);
+
+                                        // write modified tag list into the article object
+                                        articles[index].tags = tags;
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text('Abbrechen'),
+                                      onPressed: () {
+                                        // just pop the alert dialog
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ],
             )
         );
