@@ -1,26 +1,41 @@
+import 'dart:math';
+
 class Article {
 
   String language;
   String category;
-  int orderPriority;
   String name;
   List<String> content = [];
   List<String> tags = [];
 
-  Article(this.language, this.category, this.name, this.content, this.orderPriority);
+  // used for the article editor (key)
+  int id;
+
+  Article(this.language, this.category, this.name, this.content, this.tags) {
+    id = Random().nextInt(2147483647);
+  }
 
   /// deserializes a [json] and creates an [Article]
   Article.fromJSON(Map<String, dynamic> json) {
     name = json['name'];
-    orderPriority = json['orderPriority'];
     language = json['language'];
     category = json['category'];
 
-    List<dynamic> contentList = json['content'];
-    contentList.forEach((contentLine) => content.add(contentLine));
+    id = Random().nextInt(2147483647);
 
-    List<dynamic> tagList = json['tags'];
-    tagList.forEach((tag) => tags.add(tag));
+    if(json['content'] != null) content = json['content'].cast<String>();
+    if(json['tags'] != null) tags = json['tags'].cast<String>();
+  }
+
+  /// serializes an [Article] and creates a [json]
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'language': language,
+      'category': category,
+      'content': content,
+      'tags': tags
+    };
   }
 
   /// tells whether or not the [Article] is valid

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:informatik_merkhilfe_admin/models/article.dart';
 import 'package:informatik_merkhilfe_admin/models/category.dart';
 import 'package:informatik_merkhilfe_admin/models/language.dart';
 
@@ -60,8 +61,6 @@ class JsonService {
         // generate language object from json object
         Language lang = Language.fromJSON(map);
 
-        if(!lang.isValid()) return false;
-
         tempLanguageObjects.add(lang);
       }
 
@@ -117,8 +116,6 @@ class JsonService {
 
         // generate category object from json object
         Category cat = Category.fromJSON(map);
-
-        if(!cat.isValid()) return false;
       }
 
       return true;
@@ -127,5 +124,55 @@ class JsonService {
     }
   }
 
+  /// takes a list of [Article]s and tries to encode it as a jsonString
+  static String writeArticles(List<Article> list) {
+    return JsonEncoder.withIndent('  ').convert(list);
+  }
+
+
+  /// takes a [jsonString] and tries to decode it as a [List<Article>]
+  static List<Article> readArticles(String jsonString) {
+    if(!validateArticleJsonString(jsonString)) return [];
+
+    List<Article> list = [];
+
+    // read json array from json file
+    List<dynamic> articles = jsonDecode(jsonString);
+
+    // iterate through all article json objects
+    for(Map<String, dynamic> map in articles) {
+
+      // generate article object from json object
+      Article article = Article.fromJSON(map);
+
+      list.add(article);
+    }
+
+    return list;
+  }
+
+  /// checks if a given [jsonString] is a valid language json
+  static bool validateArticleJsonString(String jsonString) {
+    if(!isJson(jsonString)) return false;
+
+    try {
+      // check if json is a json array
+      if(!(jsonDecode(jsonString) is List<dynamic>)) return false;
+
+      // read json array from json file
+      List<dynamic> articles = jsonDecode(jsonString);
+
+      // iterate through all article json objects
+      for(Map<String, dynamic> map in articles) {
+
+        // generate article object from json object
+        Article article = Article.fromJSON(map);
+      }
+
+      return true;
+    } on FormatException catch(e) {
+      return false;
+    }
+  }
 
 }

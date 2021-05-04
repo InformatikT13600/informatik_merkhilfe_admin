@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:informatik_merkhilfe_admin/models/SectionType.dart';
 import 'package:informatik_merkhilfe_admin/services/jsonService.dart';
 import 'package:informatik_merkhilfe_admin/shared/styles.dart';
+import 'package:informatik_merkhilfe_admin/views/articleEditor.dart';
 import 'package:informatik_merkhilfe_admin/views/categoryEditor.dart';
 import 'package:informatik_merkhilfe_admin/views/languageEditor.dart';
 
@@ -126,6 +127,7 @@ class _SectionState extends State<Section> {
     switch(widget.type) {
       case(SectionType.LANGUAGE): return JsonService.validateLanguageJsonString(input);
       case(SectionType.CATEGORY): return JsonService.validateCategoryJsonString(input);
+      case(SectionType.ARTICLE): return JsonService.validateArticleJsonString(input);
       default: return false;
     }
 }
@@ -136,6 +138,7 @@ class _SectionState extends State<Section> {
     switch(widget.type) {
       case(SectionType.LANGUAGE): editor = LanguageEditor(key); break;
       case(SectionType.CATEGORY): editor = CategoryEditor(key); break;
+      case(SectionType.ARTICLE): editor = ArticleEditor(key); break;
       default: editor = Text('valide');
     }
 
