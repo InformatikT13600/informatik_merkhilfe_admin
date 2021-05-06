@@ -129,7 +129,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
         TextEditingController _languageController = TextEditingController(text: cat.language);
 
         // check if the specified language exists and set it's color as borderColor
-        Color borderColor = languages.firstWhere((element) => element.name.startsWith(_languageController.value.text), orElse: () => Language('', colorContrast.toString())).color;
+        Color borderColor = languages.firstWhere((element) => element.name.startsWith(_languageController.value.text), orElse: () => Language('', colorContrast.toString().substring(8, colorContrast.toString().length-1))).color;
 
         return Container(
           key: Key('${cat.id}'),
