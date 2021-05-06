@@ -137,7 +137,7 @@ class _SectionState extends State<Section> {
 
     switch(widget.type) {
       case(SectionType.LANGUAGE): editor = LanguageEditor(key); break;
-      case(SectionType.CATEGORY): editor = CategoryEditor(key); break;
+      case(SectionType.CATEGORY): editor = CategoryEditor(key, null, null); break;
       case(SectionType.ARTICLE): editor = ArticleEditor(key); break;
       default: editor = Text('valide');
     }

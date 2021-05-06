@@ -11,7 +11,11 @@ class CategoryEditor extends StatefulWidget {
 
   final String controllerKey;
 
-  CategoryEditor(this.controllerKey);
+  final Category parentCategory;
+  final List<Category> initialChildren;
+  final Function updateParent;
+
+  CategoryEditor(this.controllerKey, this.initialChildren, this.parentCategory, {this.updateParent});
 
   @override
   _CategoryEditorState createState() => _CategoryEditorState();
@@ -23,12 +27,22 @@ class _CategoryEditorState extends State<CategoryEditor> {
   Map<String, bool> showChildren = {};
 
   bool valid = true;
+  bool isChildrenEditor = false;
 
   update() => setState(() {});
 
   @override
   void initState() {
-    readJsonInputField();
+    // check if a controller has been passed
+    if(widget.controllerKey != null) readJsonInputField();
+    else {
+      print('no controller');
+      // if there is no controller, this is assumed to be a children category editor
+      categories = widget.initialChildren;
+      isChildrenEditor = true;
+    }
+
+    if(categories == null) categories = [];
   }
 
   void readJsonInputField() {
@@ -39,6 +53,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
 
   @override
   Widget build(BuildContext context) {
+    print('build category editor with isChildren? : $isChildrenEditor');
 
     // check if there is a valid language json
     if(!JsonService.validateLanguageJsonString(Section.controllers[SectionType.LANGUAGE.name].text)) {
@@ -53,23 +68,29 @@ class _CategoryEditorState extends State<CategoryEditor> {
       shrinkWrap: true,
       header: Column(
         children: [
-          TextButton(
+          !isChildrenEditor ? TextButton(
               onPressed: () {
                 Section.controllers[widget.controllerKey].text = JsonService.writeCategories(categories);
               },
               child: Text('∧ In JSON schreiben ∧')
-          ),
-          TextButton(
+          ) : Container(),
+          !isChildrenEditor ? TextButton(
               onPressed: () {
                 readJsonInputField();
               },
               child: Text('∨ JSON lesen ∨')
-          ),
+          ) : Container(),
+          isChildrenEditor ? TextButton(
+              onPressed: () {
+                readJsonInputField();
+              },
+              child: Text('Update Parent'),
+          ) : Container(),
           IconButton(
             icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
             onPressed: () {
 
-              // check if there alraedy is a category without name
+              // check if there already is a category without name
               if(!categories.any((element) => element.name.isEmpty)) {
                 setState(() {
                   categories.add(new Category('', [], ''));
@@ -93,6 +114,9 @@ class _CategoryEditorState extends State<CategoryEditor> {
         // remove it from the list
         categories.removeAt(oldIndex);
 
+        // update parent if it's a children Editor
+        if(isChildrenEditor) updateParent(widget.parentCategory, categories);
+
       },
       itemBuilder: (context, index) {
 
@@ -101,68 +125,101 @@ class _CategoryEditorState extends State<CategoryEditor> {
         String showChildrenKey = cat.language+cat.name;
         showChildren.putIfAbsent(showChildrenKey, () => false);
 
+        print('current category: ${cat.language}${cat.name}${cat.childrenCategories.length}');
+
         return Container(
-            key: Key('${cat.id}'),
-            padding: EdgeInsets.all(5),
-            margin: EdgeInsets.only(bottom: 10),
-            height: 70,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                border: Border.all(
-                  color: colorContrast,
-                  width: 3,
-                )
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    key: Key('${cat.id}-textinput'),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      isCollapsed: false,
-                      border: UnderlineInputBorder(borderSide: BorderSide.none),
-                    ),
-                    initialValue: cat.name,
-                    onChanged: (newName) => categories[index].name = newName,
-                    style: TextStyle(color: colorMainAppbar, fontSize: 25),
+          key: Key('${cat.id}'),
+          margin: EdgeInsets.only(bottom: 10),
+          child: Column(
+            key: Key('${cat.id}-section'),
+            children: [
+              Container(
+                  key: Key('${cat.id}-container'),
+                  padding: EdgeInsets.all(5),
+                  margin: EdgeInsets.only(bottom: 10),
+                  height: 70,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(
+                        color: colorContrast,
+                        width: 3,
+                      )
                   ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          key: Key('${cat.id}-textinput'),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            isCollapsed: false,
+                            border: UnderlineInputBorder(borderSide: BorderSide.none),
+                          ),
+                          initialValue: cat.name,
+                          onChanged: (newName) => categories[index].name = newName,
+                          style: TextStyle(color: colorMainAppbar, fontSize: 25),
+                        ),
+                      ),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
+                      Expanded(
+                        child: TextFormField(
+                          key: Key('${cat.id}-languageinput'),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            isCollapsed: false,
+                            border: UnderlineInputBorder(borderSide: BorderSide.none),
+                          ),
+                          initialValue: cat.language,
+                          autovalidateMode: AutovalidateMode.always,
+                          validator: (input) {
+                            // checks if there is any language, that starts with the input
+                            return !languages.any((element) => element.name.startsWith(input)) ? 'Unbekannte Sprache' : null;
+                          },
+                          onChanged: (newLanguage) => categories[index].language = newLanguage,
+                          style: TextStyle(color: colorMainAppbar, fontSize: 25),
+                        ),
+                      ),
+                      IconButton(
+                        icon: SvgPicture.asset('assets/icons/arrow_${showChildren[showChildrenKey] ? 'up' : 'down'}.svg'),
+                        onPressed: () {
+                            setState(() {
+                              showChildren.update(showChildrenKey, (value) => !value);
+                            });
+                        },
+                      ),
+                      SizedBox(width: 30,)
+                    ],
+                  )
+              ),
+              !showChildren[showChildrenKey] ? Container() : Container(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  child: CategoryEditor(null, cat.childrenCategories, widget.parentCategory, updateParent: updateParent),
                 ),
-                Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
-                Expanded(
-                  child: TextFormField(
-                    key: Key('${cat.id}-languageinput'),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      isCollapsed: false,
-                      border: UnderlineInputBorder(borderSide: BorderSide.none),
-                    ),
-                    initialValue: cat.language,
-                    autovalidateMode: AutovalidateMode.always,
-                    validator: (input) {
-                      // checks if there is any language, that starts with the input
-                      return !languages.any((element) => element.name.startsWith(input)) ? 'Unbekannte Sprache' : null;
-                    },
-                    onChanged: (newLanguage) => categories[index].language = newLanguage,
-                    style: TextStyle(color: colorMainAppbar, fontSize: 25),
-                  ),
-                ),
-                IconButton(
-                  icon: SvgPicture.asset('assets/icons/arrow_${showChildren[showChildrenKey] ? 'up' : 'down'}.svg'),
-                  onPressed: () {
-                      setState(() {
-                        showChildren.update(showChildrenKey, (value) => !value);
-                      });
-                  },
-                ),
-                SizedBox(width: 30,)
-              ],
-            )
+              )
+            ],
+          ),
         );
       },
     );
+  }
+
+  void updateParent(Category cat, List<Category> newChildren) {
+    setState(() {
+      // iterate through categories
+      for(int index = 0; index < categories.length; index++) {
+        print('iterate through categories: Index $index');
+        // check if current category is the modified one
+        if(categories[index] == cat) {
+          print('found category ${cat.name}');
+          categories[index].childrenCategories = newChildren;
+          // break
+          break;
+        }
+      }
+    });
   }
 }
 
