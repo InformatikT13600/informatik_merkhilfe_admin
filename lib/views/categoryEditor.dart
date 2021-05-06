@@ -122,10 +122,14 @@ class _CategoryEditorState extends State<CategoryEditor> {
 
         Category cat = categories[index];
 
-        String showChildrenKey = cat.language+cat.name;
+        String showChildrenKey = '${cat.id}showChildren';
         showChildren.putIfAbsent(showChildrenKey, () => false);
 
-        print('current category: ${cat.language}${cat.name}${cat.childrenCategories.length}');
+
+        TextEditingController _languageController = TextEditingController(text: cat.language);
+        
+        // check if the specified language exists and set it's color as borderColor
+        Color borderColor = languages.firstWhere((element) => element.name.startsWith(_languageController.value.text), orElse: () => Language('', colorContrast.toString())).color;
 
         return Container(
           key: Key('${cat.id}'),
@@ -141,7 +145,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       border: Border.all(
-                        color: colorContrast,
+                        color: borderColor,
                         width: 3,
                       )
                   ),
@@ -166,12 +170,12 @@ class _CategoryEditorState extends State<CategoryEditor> {
                       Expanded(
                         child: TextFormField(
                           key: Key('${cat.id}-languageinput'),
+                          controller: _languageController,
                           decoration: InputDecoration(
                             isDense: true,
                             isCollapsed: false,
                             border: UnderlineInputBorder(borderSide: BorderSide.none),
                           ),
-                          initialValue: cat.language,
                           autovalidateMode: AutovalidateMode.always,
                           validator: (input) {
                             // checks if there is any language, that starts with the input
