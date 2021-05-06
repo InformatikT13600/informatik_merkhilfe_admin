@@ -110,6 +110,12 @@ class _ArticleEditorState extends State<ArticleEditor> {
 
         Article article = articles[index];
 
+        TextEditingController _languageController = TextEditingController(text: article.language);
+
+        // check if the specified language exists and set it's color as borderColor
+        Color borderColor = languages.firstWhere((element) => element.name.startsWith(_languageController.value.text), orElse: () => Language('', colorContrast.toString().substring(8, colorContrast.toString().length-1))).color;
+
+
         return Container(
             key: Key('${article.id}'),
             padding: EdgeInsets.all(5),
@@ -118,7 +124,7 @@ class _ArticleEditorState extends State<ArticleEditor> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
-                  color: colorContrast,
+                  color: borderColor,
                   width: 3,
                 )
             ),
@@ -142,7 +148,7 @@ class _ArticleEditorState extends State<ArticleEditor> {
                           style: TextStyle(color: colorMainAppbar, fontSize: 25),
                         ),
                       ),
-                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: borderColor,),
                       Expanded(
                         child: TextFormField(
                           key: Key('${article.id}-languageinput'),
@@ -151,7 +157,7 @@ class _ArticleEditorState extends State<ArticleEditor> {
                             isCollapsed: false,
                             border: UnderlineInputBorder(borderSide: BorderSide.none),
                           ),
-                          initialValue: article.language,
+                          controller: _languageController,
                           autovalidateMode: AutovalidateMode.always,
                           validator: (input) {
                             // checks if there is any language, that starts with the input
@@ -161,7 +167,7 @@ class _ArticleEditorState extends State<ArticleEditor> {
                           style: TextStyle(color: colorMainAppbar, fontSize: 25),
                         ),
                       ),
-                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: borderColor,),
                       Expanded(
                         child: TextFormField(
                           key: Key('${article.id}-categoryinput'),
