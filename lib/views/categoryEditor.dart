@@ -127,7 +127,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
 
 
         TextEditingController _languageController = TextEditingController(text: cat.language);
-        
+
         // check if the specified language exists and set it's color as borderColor
         Color borderColor = languages.firstWhere((element) => element.name.startsWith(_languageController.value.text), orElse: () => Language('', colorContrast.toString())).color;
 
@@ -166,7 +166,7 @@ class _CategoryEditorState extends State<CategoryEditor> {
                           style: TextStyle(color: colorMainAppbar, fontSize: 25),
                         ),
                       ),
-                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: colorContrast,),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 10), width: 2, color: borderColor,),
                       Expanded(
                         child: TextFormField(
                           key: Key('${cat.id}-languageinput'),
