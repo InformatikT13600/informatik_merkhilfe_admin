@@ -186,6 +186,13 @@ class _CategoryEditorState extends State<CategoryEditor> {
                         ),
                       ),
                       IconButton(
+                        icon: SvgPicture.asset('assets/icons/delete.svg'),
+                        onPressed: () {
+                          categories.remove(cat);
+                          update();
+                        },
+                      ),
+                      IconButton(
                         icon: SvgPicture.asset('assets/icons/arrow_${showChildren[showChildrenKey] ? 'up' : 'down'}.svg'),
                         onPressed: () {
                             setState(() {
