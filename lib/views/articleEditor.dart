@@ -200,7 +200,129 @@ class _ArticleEditorState extends State<ArticleEditor> {
                       icon: SvgPicture.asset('assets/icons/content.svg'),
                       onPressed: () {
 
+                        showDialog(context: context, builder: (context) {
+                          // copy the content list of the article
+                          List<String> content = List.from(article.content);
 
+                          // map that assignes a bool to each line, telling whether or not it is a code line
+                          Map<int,bool> isCodeLine = {};
+                          for(int i = 0; i < content.length; i++) {
+                            // check if line is a code line
+                            if(content[i].startsWith('<code>')) {
+                              // remove tag
+                              content[i] = content[i].substring(6, content[i].length);
+
+                              isCodeLine.putIfAbsent(i, () => true);
+                            } else
+                              isCodeLine.putIfAbsent(i, () => false);
+                          }
+
+
+                          return StatefulBuilder(builder: (context, setState) {
+                            return AlertDialog(
+                              backgroundColor: colorMainBackground,
+                              title: Center(child: Text('Content', style: TextStyle(fontSize: 30, color: colorMainAppbar),)),
+                              content: Container(
+                                height: 800,
+                                width: 400,
+                                child: Column(
+                                  children: [
+                                    IconButton(
+                                      icon: Transform.scale(scale: 1, child: SvgPicture.asset('assets/icons/add.svg'),),
+                                      onPressed: () {
+                                        // check if there already is a line without name
+                                        if(!content.any((element) => element.isEmpty)) {
+                                          setState(() {
+                                            content.add('');
+                                          });
+                                        }
+                                      },
+                                    ),
+                                    Expanded(
+                                      child: ListView.builder(
+                                        itemCount: content.length,
+                                        scrollDirection: Axis.vertical,
+                                        itemBuilder: (context, lineIndex) {
+                                          return Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: TextFormField(
+                                                      key: Key('${article.id}-tag-${content[lineIndex]}'),
+                                                      decoration: InputDecoration(
+                                                        isDense: true,
+                                                        isCollapsed: false,
+                                                        border: UnderlineInputBorder(borderSide: BorderSide.none),
+                                                      ),
+                                                      minLines: 1,
+                                                      maxLines: 20,
+                                                      initialValue: content[lineIndex],
+                                                      onChanged: (newTag) => content[lineIndex] = newTag,
+                                                      style: TextStyle(color: colorContrast, fontSize: 25),
+                                                      validator: (input) => input.isEmpty ? 'Leere Zeile' : null,
+                                                      autovalidateMode: AutovalidateMode.always,
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: SvgPicture.asset('assets/icons/code_${isCodeLine[lineIndex] ? 'enabled' : 'disabled'}.svg'),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        // revert bool
+                                                        isCodeLine.update(lineIndex, (value) => !value);
+                                                      });
+                                                    },
+                                                  ),
+                                                  IconButton(
+                                                    icon: SvgPicture.asset('assets/icons/delete.svg'),
+                                                    onPressed: () {
+                                                      content.removeAt(lineIndex);
+                                                      setState(() {});
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                              Container(
+                                                height: 2,
+                                                width: double.infinity,
+                                                color: colorContrast,
+                                              )
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    TextButton(
+                                      child: Text('Änderung Speichern'),
+                                      onPressed: () {
+                                        // remove empty lines
+                                        content.removeWhere((element) => element.isEmpty);
+
+                                        // assign each code line with a <code> tag
+                                        List<String> newContent = [];
+                                        for(int i = 0; i < content.length; i++)
+                                          newContent.add(isCodeLine[i] ? '<code>${content[i]}' : content[i]);
+
+                                        // write modified content into the article object
+                                        articles[index].content = newContent;
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text('Abbrechen'),
+                                      onPressed: () {
+                                        // just pop the alert dialog
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+
+                        });
 
                       },
                     ),
